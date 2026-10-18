@@ -1,0 +1,42 @@
+plugins { id 'com.android.application' }
+
+def ksFile = System.getenv('KEYSTORE_FILE')
+
+android {
+    namespace 'com.rkdesign.rkapps'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.rkdesign.rkapps'
+        minSdk 24
+        targetSdk 34
+        // Naikkan versionCode setiap kali kamu merilis APK baru (supaya bisa menimpa APK lama).
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        release {
+            if (ksFile) {
+                storeFile file(ksFile)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // Tanpa kunci rahasia, APK ditandatangani kunci debug (tetap bisa dipasang).
+            signingConfig ksFile ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { abortOnError false; checkReleaseBuilds false }
+}
